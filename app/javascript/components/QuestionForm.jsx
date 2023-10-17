@@ -1,25 +1,15 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography } from '@mui/material';
 
+const LUCKY_QUESTIONS = [
+  "What is a minimalist entrepreneur?",
+  "What is your definition of community?",
+  "How do I decide what kind of business I should start?"
+];
+
 const QuestionForm = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-
-  const handleLucky = async () => {
-    try {
-      const response = await fetch('/api/lucky');
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      setQuestion(data.question);
-      setAnswer(data.answer);
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,7 +53,10 @@ const QuestionForm = () => {
           variant="contained"
           color="secondary"
           sx={{ marginTop: 2, marginLeft: 2 }}
-          onClick={() => handleLucky()}
+          onClick={() => {
+            setQuestion(LUCKY_QUESTIONS[Math.floor(Math.random() * LUCKY_QUESTIONS.length)]);
+            handleSubmit({ preventDefault: () => {} });
+          }}
         >
           I'm feeling lucky
         </Button>
