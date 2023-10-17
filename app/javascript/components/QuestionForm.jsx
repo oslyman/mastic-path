@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography } from '@mui/material';
 
-const LUCKY_QUESTIONS = [
-  "What is a minimalist entrepreneur?",
-  "What is your definition of community?",
-  "How do I decide what kind of business I should start?"
-];
-
 const QuestionForm = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
@@ -15,10 +9,12 @@ const QuestionForm = () => {
     e.preventDefault();
     
     try {
+      const csrf = document.querySelector("meta[name='csrf-token']").getAttribute("content");
       const response = await fetch('/api/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf,
         },
         body: JSON.stringify({ question }),
       });
@@ -47,18 +43,6 @@ const QuestionForm = () => {
         />
         <Button type="submit" variant="contained" color="primary" sx={{ marginTop: 2 }}>
           Ask
-        </Button>
-        <Button
-          type="button"
-          variant="contained"
-          color="secondary"
-          sx={{ marginTop: 2, marginLeft: 2 }}
-          onClick={() => {
-            setQuestion(LUCKY_QUESTIONS[Math.floor(Math.random() * LUCKY_QUESTIONS.length)]);
-            handleSubmit({ preventDefault: () => {} });
-          }}
-        >
-          I'm feeling lucky
         </Button>
       </form>
       {answer && (
