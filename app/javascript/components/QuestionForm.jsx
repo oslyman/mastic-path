@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography } from '@mui/material';
+import { Button, CircularProgress, TextField, Typography } from '@mui/material';
 
 const QuestionForm = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setAnswer('');
     
     try {
       const csrf = document.querySelector("meta[name='csrf-token']").getAttribute("content");
@@ -28,6 +31,7 @@ const QuestionForm = () => {
     } catch (error) {
       console.error('Error:', error);
     }
+    setLoading(false);
   };
 
   return (
@@ -42,7 +46,7 @@ const QuestionForm = () => {
           onChange={(e) => setQuestion(e.target.value)}
         />
         <Button type="submit" variant="contained" color="primary" sx={{ marginTop: 2 }}>
-          Ask
+          { loading ? <CircularProgress size={24} color="inherit" /> : "Ask" }
         </Button>
       </form>
       {answer && (
