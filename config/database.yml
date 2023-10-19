@@ -21,5 +21,10 @@ test:
   database: storage/test.sqlite3
 
 production:
-  <<: *default
-  database: storage/production.sqlite3
+  adapter: postgresql
+  encoding: unicode
+  host: localhost 
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: mastic_path_production
+  username: mastic_path_db
+  password: <%= ENV['PROD_DATABASE_PASSWORD'] %>
