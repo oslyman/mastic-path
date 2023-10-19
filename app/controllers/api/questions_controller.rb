@@ -5,7 +5,13 @@ class Api::QuestionsController < ApplicationController
   def ask
     question = params[:question]
     if question[-1] != '?' then question += '?' end
-    answer = generate_answer(question)
+    question_record = Question.find_by(question: question)
+    if question_record
+      answer = question_record.answer
+    else
+      answer = generate_answer(question)
+      Question.create(question: question, answer: answer)
+    end
     render json: { answer: answer }
   end
 
@@ -20,14 +26,11 @@ class Api::QuestionsController < ApplicationController
 
   def get_chapters(question_embedding)
     similarities = []
-    pwd = File.dirname('../..')
-    puts pwd
     CSV.foreach(Rails.root.join('public', 'the-prince-embeddings.tsv'), headers: true, col_sep: "\t") do |row|
       chapter_number = row['Chapter Number'].to_i
       chapter_text = row['Chapter Text']
       chapter_embedding = row['Chapter Embedding'].split(', ').map(&:to_f)
       similarity = cosine_similarity(Vector[*chapter_embedding], Vector[*question_embedding])
-      puts similarity
       similarities << { chapter_number: chapter_number, chapter_text: chapter_text, similarity: similarity }
     end
 
@@ -62,7 +65,6 @@ class Api::QuestionsController < ApplicationController
     chapters = get_chapters(question_embedding)
 
     prompt = construct_prompt(question, chapters)
-    puts prompt
     answer = openai_client.completions(
       parameters: {
         model: "gpt-3.5-turbo-instruct",
