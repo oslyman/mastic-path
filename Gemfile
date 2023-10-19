@@ -67,3 +67,4 @@ group :development do
 
 end
 
+gem "ruby-openai"
